@@ -52,14 +52,15 @@ class CatalogUpdater(object):
 
     usfm_api = 'https://api.unfoldingword.org/{0}/txt/1/{1}-{2}/{3}'
 
-    obs_v1_local = '/var/www/vhosts/api.unfoldingword.org/httpdocs/obs/txt/1'
+    api_path = '/var/www/vhosts/api.unfoldingword.org/httpdocs'
+    obs_v1_local = api_path+'/obs/txt/1'
     obs_v1_api = 'https://api.unfoldingword.org/obs/txt/1'
     obs_v1_url = '{0}/obs-catalog.json'.format(obs_v1_api)
-    obs_v2_local = '/var/www/vhosts/api.unfoldingword.org/httpdocs/ts/txt/2'
+    obs_v2_local = api_path+'/ts/txt/2'
     obs_v2_api = 'https://api.unfoldingword.org/ts/txt/2'
     obs_audio_url = 'https://api.unfoldingword.org/obs/mp3/1/en/en-obs-v4/status.json'
 
-    uw_v2_local = '/var/www/vhosts/api.unfoldingword.org/httpdocs/uw/txt/2/catalog.json'
+    uw_v2_local = api_path+'/uw/txt/2/catalog.json'
     ts_obs_langs_url = 'https://api.unfoldingword.org/ts/txt/2/obs/languages.json'
 
     def __init__(self, domain, slug, lang):
@@ -67,12 +68,12 @@ class CatalogUpdater(object):
         if domain and slug and lang:
             self.bible_slugs = [(domain, slug, lang), ]
         else:
-            self.bible_slugs = CatalogUpdater.get_bibles()
+            self.bible_slugs = CatalogUpdater.get_bibles(self.api_path)
 
     @staticmethod
-    def get_bibles():
+    def get_bibles(api_path):
 
-        dir_base = '/var/www/vhosts/api.unfoldingword.org/httpdocs/{0}/txt/1/'
+        dir_base = api_path+'/{0}/txt/1/'
         slugs = []
 
         # ulb = Unlocked Literal Bible
@@ -222,28 +223,28 @@ class CatalogUpdater(object):
                     slug_cat['usfm'] = self.usfm_api.format(domain, slug, lang, usfm_name) + '?' + source_date
 
                     # add link to terms
-                    if os.path.isfile('{0}/bible/{1}/terms.json'.format(self.obs_v2_local, lang)):
+                    if slug == 'ulb' and os.path.isfile('{0}/bible/{1}/terms.json'.format(self.obs_v2_local, lang)):
                         slug_cat['terms'] = CatalogUpdater.add_date('{0}/bible/{1}/terms.json'.format(self.obs_v2_api,
                                                                                                       lang))
                     else:
                         slug_cat['terms'] = ''
 
                     # add link to notes
-                    if os.path.isfile('{0}/{1}/{2}/notes.json'.format(self.obs_v2_local, bk, lang)):
+                    if slug == 'ulb' and os.path.isfile('{0}/{1}/{2}/notes.json'.format(self.obs_v2_local, bk, lang)):
                         slug_cat['notes'] = CatalogUpdater.add_date('{0}/{1}/{2}/notes.json'.format(self.obs_v2_api, bk,
                                                                                                     lang))
                     else:
                         slug_cat['notes'] = ''
 
                     # add link to tW
-                    if os.path.isfile('{0}/{1}/{2}/tw_cat.json'.format(self.obs_v2_local, bk, lang)):
+                    if slug == 'ulb' and os.path.isfile('{0}/{1}/{2}/tw_cat.json'.format(self.obs_v2_local, bk, lang)):
                         slug_cat['tw_cat'] = CatalogUpdater.add_date('{0}/{1}/{2}/tw_cat.json'.format(self.obs_v2_api,
                                                                                                       bk, lang))
                     else:
                         slug_cat['tw_cat'] = ''
 
                     # add link to tQ
-                    if os.path.isfile('{0}/{1}/{2}/questions.json'.format(self.obs_v2_local, bk, lang)):
+                    if slug == 'ulb' and os.path.isfile('{0}/{1}/{2}/questions.json'.format(self.obs_v2_local, bk, lang)):
                         slug_cat['checking_questions'] = CatalogUpdater.add_date('{0}/{1}/{2}/questions.json'
                                                                                  .format(self.obs_v2_api, bk, lang))
                     else:

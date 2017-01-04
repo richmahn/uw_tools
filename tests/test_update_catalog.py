@@ -21,8 +21,7 @@ class TestUpdateCatalog(TestCase):
     def tearDown(self):
         remove_tree(self.temp_dir, ignore_errors=True)
 
-    def test_obs_catalog(self):
-
+    def test_catalog(self):
         obs_v1_local = '{0}/obs/txt/1'.format(self.temp_dir)
         obs_v1_url = 'file://{0}/obs-catalog.json'.format(obs_v1_local)
         lang_url = 'file://{0}/td/langnames.json'.format(self.temp_dir)
@@ -31,6 +30,7 @@ class TestUpdateCatalog(TestCase):
         ts_obs_langs_url = 'file://{0}/ts/txt/2/obs/languages.json'.format(self.temp_dir)
 
         # set up mocking
+        CatalogUpdater.api_path = self.temp_dir
         CatalogUpdater.obs_v1_local = obs_v1_local
         CatalogUpdater.obs_v2_local = '{0}/ts/txt/2'.format(self.temp_dir)
         CatalogUpdater.uw_v2_local = uw_v2_local
@@ -74,3 +74,12 @@ class TestUpdateCatalog(TestCase):
         self.assertEquals(fr_obs['notes'], '')
         self.assertEquals(fr_obs['terms'], '')
         self.assertEquals(fr_obs['tw_cat'], '')
+
+        # check door43.org/issues/378: remove tW, tN and tQ links from non-ULB resources
+        en_gen = load_json_object('{0}/ts/txt/2/gen/en/resources.json'.format(self.temp_dir))
+        for resource in en_gen:
+            if resource['slug'] != 'ulb':
+                self.assertEquals(resource['checking_questions'], '')
+                self.assertEquals(resource['notes'], '')
+                self.assertEquals(resource['terms'], '')
+                self.assertEquals(resource['tw_cat'], '')
