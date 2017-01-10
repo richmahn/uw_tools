@@ -83,3 +83,9 @@ class TestUpdateCatalog(TestCase):
                 self.assertEquals(resource['notes'], '')
                 self.assertEquals(resource['terms'], '')
                 self.assertEquals(resource['tw_cat'], '')
+            else:
+                self.assertNotEquals(resource['checking_questions'], '')
+                self.assertNotEquals(resource['notes'], '')
+                self.assertNotEquals(resource['terms'], '')
+                self.assertNotEquals(resource['tw_cat'], '')
+
